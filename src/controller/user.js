@@ -1,6 +1,5 @@
-const UserModel=require('models/user.model.')
+const UserModel=require('../models/user')
 const bcrypt=require('bcrypt')
-const {email, sweat, us} = require("yarn/lib/cli");
 
 const createUser=async (req,res)=>{
     try{
@@ -21,12 +20,14 @@ const login=async (req,res)=>{
             res.status(404).json({message:"User not found"})
         }
 
-        const ispassword=await bcrypt.compare(password,user.password)
-        if(!ispassword){
+        const isPasswordValid=await bcrypt.compare(password,user.password)
+        if(!isPasswordValid){
             console.log("Invalid Password! Please Enter Invalid Password")
             res.status(404).json({message:"Invalid password"})
         }
 
+        const token=await user.generateAuthToken()
+        return res.status(200).json(token)
     }
     catch (error){
         console.log("login usercontroller error",error)
@@ -47,7 +48,7 @@ const updateUser=async (req,res)=>{
     }
 }
 
-const getalluser=async (req,res)=>{
+const getAlluser=async (req,res)=>{
     try{
         const {page,limit}=req.query;
         const option={
@@ -99,5 +100,5 @@ module.exports={
     updateUser,
     deleteUser,
     getUser,
-    getalluser
+    getAlluser
 }
